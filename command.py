@@ -7,7 +7,8 @@ class Command:
         self.prefix = '$'
 
         self.name = self.message.split('$')[1].split(' ')[0]
-        self.args = self.message.split('$')[1].pop(0)
+        self.args = self.message.split('$')[1].split(' ')
+        self.args.pop(0)
 
     def getCommand(self):
         data = json.load(open('commands.json', 'r'))

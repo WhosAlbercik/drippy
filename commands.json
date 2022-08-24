@@ -1,4 +1,10 @@
 {
-
+    "kick":{
+        "name":"kick",
+        "description":"The Kick command is used to kick a user from the server.",
+        "help":"$kick <user> <time<m/h/d>> <reason>",
+        "args": "min3",
+        "permissions": 1
+    }
     
 }
