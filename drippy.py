@@ -35,8 +35,10 @@ class Drippy:
 
     async def kick(self, c: Command):
         await self.logging(c, c.message.mentions[0])
+
+        await c.message.mentions[0].kick()
         
-    async def logging(self, c: Command, punished: discord.Member | None):
+    async def logging(self, c: Command, punished: discord.Member):
         channelid = self.getConfig("logging")
         channel = discord.utils.get(c.message.guild.text_channels, id=channelid)
 
