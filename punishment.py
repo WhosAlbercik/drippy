@@ -23,7 +23,7 @@ class Punishment:
         self.addToPunishments()
 
     def addToPunishments(self):
-        data = json.load(open('punishments.json', 'r'))
+        data = json.load(open('json/punishments.json', 'r'))
 
         uuid = self.uuid
 
@@ -33,4 +33,4 @@ class Punishment:
         data[str(uuid)]['punished'] = self.punished.name
 
 
-        json.dump(data, open('punishments.json', 'w'), sort_keys=True, indent=4)
+        json.dump(data, open('json/punishments.json', 'w'), sort_keys=True, indent=4)

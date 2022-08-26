@@ -61,10 +61,13 @@ class Drippy:
             **Reason**: {p.reason}
             """)
 
+            dm = await punished.create_dm()
+            await dm.send(embed=embed)
+            
             await channel.send(embed=embed)
     
     def getCase(self, u: discord.Member):
-        data = json.load(open('cases.json', 'r'))
+        data = json.load(open('json/cases.json', 'r'))
 
         try:
             return data[u.name]        
@@ -72,7 +75,7 @@ class Drippy:
             return None
 
     def addToCase(self, uuid: UUID, u: discord.Member):
-        data = json.load(open('cases.json', 'r'))
+        data = json.load(open('json/cases.json', 'r'))
         
         try:
             data[u.name][str(len(data[u.name]) + 1)] = str(uuid)
@@ -80,7 +83,7 @@ class Drippy:
             data[u.name] = {}
             data[u.name][str(len(data[u.name]) + 1)] = str(uuid)
 
-        json.dump(data, open('cases.json', 'w'), sort_keys=True, indent=4)
+        json.dump(data, open('json/cases.json', 'w'), sort_keys=True, indent=4)
 
 
     def getConfig(self, value: str):
@@ -101,7 +104,14 @@ async def on_message(message):
         return
 
     c = Command(message)
-    if not c.getCommand():
+    if c.checkCommand() == None:
+        return
+    
+    elif not c.checkCommand():
+        embed = discord.Embed(color=0xd30d0d)
+        embed.set_author(name=message.author.name, icon_url=message.author.avatar.url)
+        embed.add_field(name="Something Went Wrong :x:", value="Check the amount of arguments and your permissions.\nIf that doesn't help try contacting one of the bot developers.")
+        await message.channel.send(embed=embed)
         return
 
     await eval(f"d.{c.info['name']}(c)")
