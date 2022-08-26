@@ -44,23 +44,51 @@ class Drippy:
         await c.message.mentions[0].kick()
 
     async def case(self, c: Command):
-        case = self.getCase(c.message.mentions[0])
-
-        if case == None:
-            await c.message.channel.send(f"{c.message.mentions[0].mention} Does not Have any Case History.")
-            return
-
-        embed = discord.Embed(color=0x0ee1a2)
-        embed.set_author(name=c.message.mentions[0].name, icon_url=c.message.mentions[0].avatar.url)
-
-        str = ""
-        for x in case:
-            str += f"{x}) " + case[x] + "\n"
         
-        embed.add_field(name=f"{c.message.mentions[0].name} Case History", value=str)
+        if c.args[0].startswith('<'):
+            case = self.getCase(c.message.mentions[0])
 
-        await c.message.channel.send(embed=embed)
+            if case == None:
+                await c.message.channel.send(f"{c.message.mentions[0].mention} Does not Have any Case History.")
+                return
 
+            embed = discord.Embed(color=0x0ee1a2)
+            embed.set_thumbnail(url=c.message.mentions[0].avatar.url)
+            embed.set_author(name=c.message.mentions[0].name, icon_url=c.message.mentions[0].avatar.url)
+
+            str = ""
+            for x in case:
+                str += f"{x}) " + case[x] + "\n"
+        
+            embed.add_field(name=f"{c.message.mentions[0].name} Case History", value=str)
+
+            await c.message.channel.send(embed=embed)
+            return
+        else:
+            punishment = self.getPunishment(c.args[0])
+
+            if punishment == None:
+                await c.message.channel.send("The uuid provided is not in the database :x:. Please make sure you provided the correct uuid")
+                return
+            
+            punished = discord.utils.get(c.message.guild.members, id=punishment['punished'])
+            moderator = discord.utils.get(c.message.guild.members, id=punishment['moderator'])
+
+
+            embed = discord.Embed(color=0x0ee1a2)
+            embed.set_thumbnail(url=punished.avatar.url)
+            embed.set_author(name=punished.name, icon_url=punished.avatar.url)
+            embed.add_field(name=f"Punishment nr. {c.args[0]}",
+            value=f"""**duration:** {punishment['duration']}
+        **moderator:** {moderator.mention}
+        **punished:** {punished.mention}
+        **reason:** {punishment['reason']}
+        **time** {punishment['time']}
+        **type** {punishment['type']}
+        **uuid** {punishment['uuid']}""")
+
+            await c.message.channel.send(embed=embed)
+            return
 
 
     async def logging(self, c: Command, punished: discord.Member):
@@ -81,6 +109,7 @@ class Drippy:
             self.addToCase(p.uuid, p.punished)
 
             embed = discord.Embed(color=0xd30d0d)
+            embed.set_thumbnail(url=punished.display_avatar.url)
             embed.set_author(name=punished.name, icon_url=punished.display_avatar.url)
             embed.add_field(name =f"Punishment nr. {p.uuid}",
             value=f"""**Type**: Kick
@@ -90,9 +119,12 @@ class Drippy:
             **Reason**: {p.reason}
             """)
 
-            dm = await punished.create_dm()
-            await dm.send(embed=embed)
-            
+            try:
+                dm = await punished.create_dm()
+                await dm.send(embed=embed)
+            except:
+                pass
+
             await channel.send(embed=embed)
     
     def getCase(self, u: discord.Member):
@@ -102,7 +134,7 @@ class Drippy:
         data = json.load(open('json/cases.json', 'r'))
 
         try:
-            return data[u.name]        
+            return data[str(u.id)]        
         except KeyError:
             return None
 
@@ -113,13 +145,23 @@ class Drippy:
         data = json.load(open('json/cases.json', 'r'))
         
         try:
-            data[u.name][str(len(data[u.name]) + 1)] = str(uuid)
+            data[str(u.id)][str(len(data[u.id]) + 1)] = str(uuid)
         except KeyError:
-            data[u.name] = {}
-            data[u.name][str(len(data[u.name]) + 1)] = str(uuid)
+            data[str(u.id)] = {}
+            data[str(u.id)][str(1)] = str(uuid)
 
         json.dump(data, open('json/cases.json', 'w'), sort_keys=True, indent=4)
 
+    def getPunishment(self, uuid: UUID):
+        """
+        Returns the punishment data labeled with the given uuid
+        """
+
+        data = json.load(open('json/punishments.json', 'r'))
+        try:
+            return data[str(uuid)]
+        except KeyError:
+            return None
 
     def getConfig(self, value: str):
         """

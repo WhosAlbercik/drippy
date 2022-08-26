@@ -32,8 +32,8 @@ class Punishment:
 
         data[str(self.uuid)] = self.__dict__.copy()
 
-        data[str(uuid)]['moderator'] = self.moderator.name
-        data[str(uuid)]['punished'] = self.punished.name
+        data[str(uuid)]['moderator'] = self.moderator.id
+        data[str(uuid)]['punished'] = self.punished.id
 
 
         json.dump(data, open('json/punishments.json', 'w'), sort_keys=True, indent=4)
