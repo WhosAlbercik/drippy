@@ -23,6 +23,9 @@ class Drippy:
         pass        
 
     def getToken(self):
+        """"
+        Returns the token
+        """
         try:
             data = json.load(open('token.json', 'r'))
 
@@ -33,12 +36,38 @@ class Drippy:
 
             json.dump(data, open('token.json', 'w'))
 
+    
+    
     async def kick(self, c: Command):
         await self.logging(c, c.message.mentions[0])
 
         await c.message.mentions[0].kick()
+
+    async def case(self, c: Command):
+        case = self.getCase(c.message.mentions[0])
+
+        if case == None:
+            await c.message.channel.send(f"{c.message.mentions[0].mention} Does not Have any Case History.")
+            return
+
+        embed = discord.Embed(color=0x0ee1a2)
+        embed.set_author(name=c.message.mentions[0].name, icon_url=c.message.mentions[0].avatar.url)
+
+        str = ""
+        for x in case:
+            str += f"{x}) " + case[x] + "\n"
         
+        embed.add_field(name=f"{c.message.mentions[0].name} Case History", value=str)
+
+        await c.message.channel.send(embed=embed)
+
+
+
     async def logging(self, c: Command, punished: discord.Member):
+        """
+        Logs a command on the #logs channel and in the punishments.json and cases.json files
+        """
+
         channelid = self.getConfig("logging")
         channel = discord.utils.get(c.message.guild.text_channels, id=channelid)
 
@@ -67,6 +96,9 @@ class Drippy:
             await channel.send(embed=embed)
     
     def getCase(self, u: discord.Member):
+        """"
+        returns the case history as a dictionary, of the given member (u)
+        """
         data = json.load(open('json/cases.json', 'r'))
 
         try:
@@ -75,6 +107,9 @@ class Drippy:
             return None
 
     def addToCase(self, uuid: UUID, u: discord.Member):
+        """
+        Adds the given UUID to the case history of the given user
+        """
         data = json.load(open('json/cases.json', 'r'))
         
         try:
@@ -87,6 +122,9 @@ class Drippy:
 
 
     def getConfig(self, value: str):
+        """
+        returns a value from the config
+        """
         data = json.load(open('config.json', 'r'))
 
         try:
@@ -100,6 +138,9 @@ d = Drippy()
 
 @client.event
 async def on_message(message):
+    """
+    Triggered when a message is sent, anywhere from to the bot, to any channel on the server
+    """
     if message.author.bot:
         return
 

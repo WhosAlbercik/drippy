@@ -15,6 +15,10 @@ class Command:
         self.args.pop(0)
 
     def checkCommand(self):
+        """
+        Checks if the command exists and is used in a proper way
+        """
+
         if not self.getCommand():
             return None
 
@@ -24,6 +28,9 @@ class Command:
             return True
 
     def checkArgs(self):
+        """
+        Checks if the amount of arguments is correct
+        """
         if "min" in self.info['args']:
             argCount = int(self.info['args'][0])
 
@@ -49,6 +56,9 @@ class Command:
                 return True
 
     def getCommand(self):
+        """
+        Checks if the command exists and returns it
+        """
         data = json.load(open('commands.json', 'r'))
 
         if not self.message.content.startswith(self.prefix):
@@ -62,6 +72,13 @@ class Command:
             return False
 
     def checkPerms(self):
+        """
+        checks if the command sender has the right permissions
+        0 = everyone
+        1 = moderator
+        2 = admin
+        3 = owner
+        """
         moderator = discord.utils.get(self.message.guild.roles, id=self.getConfig("moderator"))
         admin = discord.utils.get(self.message.guild.roles, id=self.getConfig("admin"))
 
@@ -75,6 +92,9 @@ class Command:
             return 0
 
     def getConfig(self, value: str):
+        """
+        Returns the config value (copied from Drippy)
+        """
         data = json.load(open('config.json', 'r'))
 
         try:

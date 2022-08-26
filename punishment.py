@@ -23,6 +23,9 @@ class Punishment:
         self.addToPunishments()
 
     def addToPunishments(self):
+        """
+        Saves the info set in the '__init__' to the punishments.json
+        """
         data = json.load(open('json/punishments.json', 'r'))
 
         uuid = self.uuid

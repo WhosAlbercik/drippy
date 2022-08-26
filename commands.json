@@ -2,15 +2,15 @@
     "kick":{
         "name":"kick",
         "description":"The Kick command is used to kick a user from the server.",
-        "help":"$kick <user> <time<m/h/d>> <reason>",
-        "args": "3min",
+        "help":"$kick <user> <reason>",
+        "args": "1min",
         "permissions": 1
     },
     
     "case":{
         "name":"case",
         "description":"The Case command is used to check the users case.",
-        "help":"$help <user>",
+        "help":"$case <user>",
         "args": "1",
         "permissions": 1
 
