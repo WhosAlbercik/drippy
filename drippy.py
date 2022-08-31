@@ -57,13 +57,19 @@ class Drippy:
             embed.set_author(name=c.message.mentions[0].name, icon_url=c.message.mentions[0].avatar.url)
 
             str = ""
+            count = 1
             for x in case:
-                str += f"{x}) " + case[x] + "\n"
-        
-            embed.add_field(name=f"{c.message.mentions[0].name} Case History", value=str)
+                str += f"{count}) **{self.getPunishment(x)['type']}** {x} \n"
+                count += 1
 
+            if str == "":
+                str = "User has no Case History"
+
+            embed.add_field(name=f"{c.message.mentions[0].name} Case History", value=str)
+            
             await c.message.channel.send(embed=embed)
             return
+        
         else:
             punishment = self.getPunishment(c.args[0])
 
@@ -90,6 +96,44 @@ class Drippy:
             await c.message.channel.send(embed=embed)
             return
 
+    async def warn(self, c: Command):
+        await self.logging(c, c.message.mentions[0])
+
+
+
+    async def delpunishment(self, c: Command):
+        punishment = self.getPunishment(c.args[0])
+
+        if punishment == None:
+            await c.message.channel.send("The uuid provided is not in the database :x:\nPlease make sure you provided the correct uuid")
+            return
+
+        self.delPunishment(punishment['uuid'])
+
+        punished = discord.utils.get(c.message.guild.members, id=punishment['punished'])
+
+        
+
+        case = self.getCase(punished)
+
+        embed = discord.Embed(title="Punishment has been deleted", color=0x26ed83)
+        embed.set_thumbnail(url=punished.avatar.url)
+        embed.set_author(name=punished.name, icon_url=punished.avatar.url)
+
+        str = ""
+        count = 1
+        try:
+            for x in case:
+                str += f"{count}) **{self.getPunishment(x)['type']}** {x} \n"
+                count += 1  
+
+        except TypeError or case == []:
+            str = "User Has no Case History"
+    
+        embed.add_field(name=f"{punished.name} new Case History", value=str)
+        await c.message.channel.send(embed=embed)
+
+
 
     async def logging(self, c: Command, punished: discord.Member):
         """
@@ -105,28 +149,40 @@ class Drippy:
             reason = " ".join(reason)
 
             p = Punishment(c, punished, "perm", reason=reason)
-
-            self.addToCase(p.uuid, p.punished)
-
             embed = discord.Embed(color=0xd30d0d)
-            embed.set_thumbnail(url=punished.display_avatar.url)
-            embed.set_author(name=punished.name, icon_url=punished.display_avatar.url)
-            embed.add_field(name =f"Punishment nr. {p.uuid}",
-            value=f"""**Type**: Kick
+
+    
+        elif c.info['name'] == "warn":
+            reason = c.args
+            reason.pop(0)
+            reason = " ".join(reason)
+
+            p = Punishment(c, punished, "perm", reason=reason)
+
+            embed = discord.Embed(color=0xedea26)
+
+
+        self.addToCase(p.uuid, p.punished)
+
+        embed.set_thumbnail(url=punished.display_avatar.url)
+        embed.set_author(name=punished.name, icon_url=punished.display_avatar.url)
+        embed.add_field(name =f"Punishment nr. {p.uuid}",
+        value=f"""**Type**: {p.type}
             **Duration**: {p.duration}
             **Moderator**: {p.moderator.mention}
             **Time**: {p.time}
-            **Reason**: {p.reason}
-            """)
+            **Reason**: {p.reason}""")
 
-            try:
-                dm = await punished.create_dm()
-                await dm.send(embed=embed)
-            except:
-                pass
+        try:
+            dm = await punished.create_dm()
+            await dm.send(embed=embed)
+        except:
+            pass
 
-            await channel.send(embed=embed)
-    
+        await channel.send(embed=embed)
+        await c.message.channel.send(embed=embed)
+        return
+
     def getCase(self, u: discord.Member):
         """"
         returns the case history as a dictionary, of the given member (u)
@@ -145,10 +201,10 @@ class Drippy:
         data = json.load(open('json/cases.json', 'r'))
         
         try:
-            data[str(u.id)][str(len(data[u.id]) + 1)] = str(uuid)
+            data[str(u.id)].append(str(uuid))
         except KeyError:
-            data[str(u.id)] = {}
-            data[str(u.id)][str(1)] = str(uuid)
+            data[str(u.id)] = []
+            data[str(u.id)].append(str(uuid))
 
         json.dump(data, open('json/cases.json', 'w'), sort_keys=True, indent=4)
 
@@ -163,6 +219,35 @@ class Drippy:
         except KeyError:
             return None
 
+    def delPunishment(self, uuid: UUID):
+        """
+        Deletes the punishment data labeled with the given uuid
+        """
+        datap = json.load(open('json/punishments.json', 'r'))
+       
+        datac = json.load(open('json/cases.json', 'r'))
+
+        try:
+            if uuid in datac[str(datap[uuid]['punished'])]:
+                datac[str(datap[uuid]['punished'])].remove(uuid)
+            else:
+                raise KeyError
+        except KeyError:
+            return False
+        
+        
+        if datac[str(datap[uuid]['punished'])] == {}:
+            del datac[str(datap[uuid]['punished'])]
+
+        try:
+            del datap[str(uuid)]
+        except KeyError:
+            return False
+
+        json.dump(datap, open('json/punishments.json', 'w'), sort_keys=True, indent=4)
+        json.dump(datac, open('json/cases.json', 'w'), sort_keys=True, indent=4)
+
+       
     def getConfig(self, value: str):
         """
         returns a value from the config

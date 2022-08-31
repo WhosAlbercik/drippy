@@ -67,9 +67,14 @@ class Command:
         try:
             self.info = data[self.name]
             return True
-        except KeyError:
-            self.info = None
-            return False
+        except:
+            for x in data:
+                if self.name in data[x]['alias']:
+                    self.info = data[x]
+                    return True
+            else:
+                self.info = None
+                return False
 
     def checkPerms(self):
         """

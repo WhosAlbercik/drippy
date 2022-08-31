@@ -4,13 +4,33 @@
         "description":"The Kick command is used to kick a user from the server.",
         "help":"$kick <user> <reason>",
         "args": "1min",
+        "alias": [],
         "permissions": 1
     },
     
     "case":{
         "name":"case",
         "description":"The Case command is used to check the users case.",
-        "help":"$case <user>",
+        "help":"$case <user/uuid>",
+        "args": "1",
+        "alias": ["c"],
+        "permissions": 1
+
+    },
+    "warn":{
+        "name":"warn",
+        "description":"The Warn command is used to warn a user.",
+        "help":"$warn <user> <reason>",
+        "args": "1min",
+        "alias": [],
+        "permissions": 1
+
+    },
+    "delpunishment":{
+        "name":"delpunishment",
+        "description":"The Delete Punishment command is used to delete a punishment from the database.",
+        "help":"$delpunishment <uuid>",
+        "alias":["delp"],
         "args": "1",
         "permissions": 1
 
