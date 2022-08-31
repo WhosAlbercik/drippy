@@ -5,7 +5,8 @@
         "help":"$kick <user> <reason>",
         "args": "1min",
         "alias": [],
-        "permissions": 1
+        "permissions": 1,
+        "mentions": "1"
     },
     
     "case":{
@@ -14,7 +15,10 @@
         "help":"$case <user/uuid>",
         "args": "1",
         "alias": ["c"],
-        "permissions": 1
+        "permissions": 1,
+        "mentions": "0to1"
+
+
 
     },
     "warn":{
@@ -23,7 +27,9 @@
         "help":"$warn <user> <reason>",
         "args": "1min",
         "alias": [],
-        "permissions": 1
+        "permissions": 1,
+        "mentions": "1"
+
 
     },
     "delpunishment":{
@@ -32,7 +38,9 @@
         "help":"$delpunishment <uuid>",
         "alias":["delp"],
         "args": "1",
-        "permissions": 1
+        "permissions": 1,
+        "mentions": "0"
+
 
     }
 }

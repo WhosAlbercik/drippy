@@ -22,7 +22,7 @@ class Command:
         if not self.getCommand():
             return None
 
-        if self.checkPerms() < self.info['permissions'] or not self.checkArgs():
+        if self.checkPerms() < self.info['permissions'] or not self.checkArgs() or not self.checkMentions():
             return False
         else:
             return True
@@ -95,6 +95,17 @@ class Command:
             return 3
         else:
             return 0
+
+    def checkMentions(self):
+        """
+        Checks if the sent command contains enough mentions
+        """
+        if self.info['mentions'] == str(len(self.message.mentions)) or self.info['mentions'] == "False":
+            return True
+        elif "to" in self.info['mentions'] and int(self.info['mentions'][0]) < len(self.message.mentions) and int(self.info['mentions'][-0]) < len(self.message.mentions):
+            return True
+        else:
+            return False
 
     def getConfig(self, value: str):
         """
