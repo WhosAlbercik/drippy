@@ -236,7 +236,7 @@ class Drippy:
             return False
         
         
-        if datac[str(datap[uuid]['punished'])] == {}:
+        if datac[str(datap[uuid]['punished'])] == []:
             del datac[str(datap[uuid]['punished'])]
 
         try:
