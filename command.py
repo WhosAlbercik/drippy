@@ -102,7 +102,7 @@ class Command:
         """
         if self.info['mentions'] == str(len(self.message.mentions)) or self.info['mentions'] == "False":
             return True
-        elif "to" in self.info['mentions'] and int(self.info['mentions'][0]) < len(self.message.mentions) and int(self.info['mentions'][-0]) < len(self.message.mentions):
+        elif "to" in self.info['mentions'] and int(self.info['mentions'][0]) < len(self.message.mentions) and int(self.info['mentions'][-1]) < len(self.message.mentions):
             return True
         else:
             return False
